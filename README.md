@@ -60,3 +60,34 @@ pub struct SetFavorites<'info> {
 
 # resources
 youtube: https://www.youtube.com/watch?v=amAq-WHAFs8
+
+
+
+
+# ============================================================
+
+## backend - anchor
+```anchor init <anchor-name>```
+anchor init backend
+
+cd backend
+anchor build
+
+### test
+use this:
+solana-keygen new --no-bip39-passphrase
+anchor test
+or:
+solana-test-validator
+solana config set --url localhost
+anchor build
+solana airdrop 10
+anchor deploy
+anchor test --skip-local-validator
+
+## frontend - react
+yarn create vite frontend --template react-ts
+
+yarn add @coral-xyz/anchor @solana/web3.js @solana/wallet-adapter-react @solana/wallet-adapter-react-ui @solana/wallet-adapter-base @solana/wallet-adapter-wallets
+
+yarn add @mui/material @emotion/react @emotion/styled @mui/icons-material

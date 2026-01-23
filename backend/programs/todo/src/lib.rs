@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("71PhfjKN3dqsHG8Ef4CbhbiHZB5Wv1LobJu3dUyM8h7e");
+declare_id!("HYSgH9tCnpkZ1h2MrcSf6773jx36CiPYe4L3DmAdQYko");
 
 pub const ACHOR_DISCRIMINATOR_SIZE: usize = 8;
 
@@ -49,7 +49,7 @@ pub struct CreateTodo<'info> {
     #[account(
         init, 
         payer = user, 
-        space = ACHOR_DISCRIMINATOR_SIZE + TodoState::INIT_SPACE,
+        space = ACHOR_DISCRIMINATOR_SIZE + TodoState::INIT_SPACE
         seeds = [b"todo", user.key().as_ref(), title.as_bytes()], 
         bump
     )]
