@@ -75,7 +75,9 @@ anchor build
 
 ### test
 use this:
-solana-keygen new --no-bip39-passphrase
+solana-keygen new --no-bip39-passphrase -o target/deploy/todo-keypair.json --force
+anchor keys sync
+anchor build
 anchor test
 or:
 solana-test-validator

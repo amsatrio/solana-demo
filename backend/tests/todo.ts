@@ -70,7 +70,7 @@ describe("todo-tests", () => {
       .updateTodo(null, newDescription, false) // Update desc and set inactive
       .accounts({
         todo: todoPda,
-        // owner: user.publicKey,
+        owner: user.publicKey,
       })
       .rpc();
 
@@ -84,7 +84,7 @@ describe("todo-tests", () => {
       .deleteTodo()
       .accounts({
         todo: todoPda,
-        // owner: user.publicKey,
+        owner: user.publicKey,
       })
       .rpc();
 
