@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { Program } from '@coral-xyz/anchor';
 import { PublicKey } from '@solana/web3.js';
 import type { Todo } from "../../../../backend/target/types/todo";
+import { Buffer } from 'buffer';
 
 interface TodoState {
     items: any[];
