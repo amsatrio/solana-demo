@@ -7,6 +7,7 @@ skip-lint = false
 
 [programs.localnet]
 todo = "H4gAgsRenNQQS5TnkbCaLE24hpPNe5YLL1sKtrqupq6z"
+vote = "6E7BxM2i1XEo35Dj9wUzwkxKCWp9ssbGMQ1FjyNzTk55"
 
 [registry]
 url = "https://api.apr.dev"
