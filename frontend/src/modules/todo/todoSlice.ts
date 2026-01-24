@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { Program } from '@coral-xyz/anchor';
 import { PublicKey } from '@solana/web3.js';
 import type { Todo } from "../../../../backend/target/types/todo";
-import { Buffer } from 'buffer';
 
 interface TodoState {
     items: any[];
@@ -35,15 +34,16 @@ export const createTodo = createAsyncThunk(
             [Buffer.from("todo"), userPublicKey.toBuffer(), Buffer.from(title)],
             program.programId
         );
+        console.log(title)
         await program.methods.createTodo(title, description).accounts({ todo: todoPda, user: userPublicKey } as any).rpc();
         dispatch(fetchTodos({ program, userPublicKey }));
     }
 );
 
-export const toggleTodo = createAsyncThunk(
-    'todos/toggleTodo',
-    async ({ program, userPublicKey, todoPda, currentStatus }: { program: Program<Todo>, userPublicKey: PublicKey, todoPda: PublicKey, currentStatus: boolean }, { dispatch }) => {
-        await program.methods.updateTodo(null, null, !currentStatus).accounts({ todo: todoPda, owner: userPublicKey } as any).rpc();
+export const updateTodo = createAsyncThunk(
+    'todos/updateTodo',
+    async ({ program, userPublicKey, todoPda, title, description, currentStatus }: { program: Program<Todo>, userPublicKey: PublicKey, todoPda: PublicKey, title: string | null, description: string | null, currentStatus: boolean }, { dispatch }) => {
+        await program.methods.updateTodo(title, description, !currentStatus).accounts({ todo: todoPda, owner: userPublicKey } as any).rpc();
         dispatch(fetchTodos({ program, userPublicKey }));
     }
 );

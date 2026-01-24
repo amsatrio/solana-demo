@@ -3,6 +3,7 @@ import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import TodoPage from './modules/todo/TodoPage';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
 
 export const App = () => {
     // The network can be set to 'devnet', 'testnet', or 'mainnet'
@@ -12,6 +13,14 @@ export const App = () => {
     // local
     const endpoint = useMemo(() => "http://127.0.0.1:8899", []);
 
+    const wallets = useMemo(
+        () => [
+            new PhantomWalletAdapter(),
+            new SolflareWalletAdapter(),
+        ],
+        []
+    );
+
     const theme = createTheme({
         colorSchemes: {
             dark: true,
@@ -20,7 +29,7 @@ export const App = () => {
     return (
         <ThemeProvider theme={theme}>
             <ConnectionProvider endpoint={endpoint}>
-                <WalletProvider wallets={[]} autoConnect>
+                <WalletProvider autoConnect wallets={wallets}>
                     <WalletModalProvider>
                         <TodoPage />
                     </WalletModalProvider>
