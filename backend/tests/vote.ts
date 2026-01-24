@@ -8,42 +8,53 @@ describe("vote-tests", () => {
   anchor.setProvider(provider);
 
   const program = anchor.workspace.Vote as Program<Vote>;
-  const user = provider.wallet;
+  const admin = provider.wallet;
+  const user = anchor.web3.Keypair.generate();
 
   // Data for our test
   const name = "Banana";
 
   // Derive the PDA for the vote account
   const [votePda] = anchor.web3.PublicKey.findProgramAddressSync(
-    [Buffer.from("vote"), user.publicKey.toBuffer(), Buffer.from(name)],
+    [Buffer.from("vote"), admin.publicKey.toBuffer(), Buffer.from(name)],
     program.programId
   );
+
+  before(async () => {
+    const signature = await provider.connection.requestAirdrop(
+      user.publicKey,
+      1 * anchor.web3.LAMPORTS_PER_SOL
+    );
+
+    const latestBlockhash = await provider.connection.getLatestBlockhash();
+
+    await provider.connection.confirmTransaction({
+      signature,
+      blockhash: latestBlockhash.blockhash,
+      lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+    });
+  });
 
   it("Creates a Vote", async () => {
     const tx = await program.methods
       .createVote(name)
       .accounts({
         vote: votePda,
-        user: user.publicKey,
+        user: admin.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
       })
       .rpc();
 
     const account = await program.account.voteState.fetch(votePda);
     expect(account.name).to.equal(name);
+    expect(account.count.toNumber()).to.equal(0);
+    expect(account.owner.toString()).to.equal(admin.publicKey.toString());
     console.log("Create TX:", tx);
   });
 
   it("Reads all Votes for the current user", async () => {
     // Fetch all accounts of type 'voteState'
-    const allVotes = await program.account.voteState.all([
-      {
-        memcmp: {
-          offset: 8, // Skip the 8-byte Anchor discriminator
-          bytes: user.publicKey.toBase58(), // Search for our public key
-        },
-      },
-    ]);
+    const allVotes = await program.account.voteState.all([]);
 
     console.log(`Found ${allVotes.length} votes for user ${user.publicKey.toBase58()}`);
 
@@ -64,10 +75,10 @@ describe("vote-tests", () => {
     const newName = "Updated Name!";
 
     await program.methods
-      .updateVote(newName, false)
+      .updateVote(newName)
       .accounts({
         vote: votePda,
-        owner: user.publicKey,
+        owner: admin.publicKey,
       })
       .rpc();
 
@@ -76,9 +87,9 @@ describe("vote-tests", () => {
     expect(account.count.toNumber()).to.equal(0);
   });
 
-  it("Updates a Vote - Count", async () => {
+  it("Cast a Vote - Count", async () => {
     await program.methods
-      .updateVote(null, true)
+      .castVote()
       .accounts({
         vote: votePda,
         owner: user.publicKey,
@@ -94,7 +105,7 @@ describe("vote-tests", () => {
       .deleteVote()
       .accounts({
         vote: votePda,
-        owner: user.publicKey,
+        owner: admin.publicKey,
       })
       .rpc();
 

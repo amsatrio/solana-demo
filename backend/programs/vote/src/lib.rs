@@ -13,7 +13,7 @@ pub mod vote {
 		let vote = &mut ctx.accounts.vote;
 		let clock = Clock::get()?;
 
-		vote.owner = *ctx.accounts.user.key;
+		vote.owner = *ctx.accounts.admin.key;
 		vote.name = name;
 		vote.count = 0;
 		vote.created_on = clock.unix_timestamp;
@@ -21,12 +21,20 @@ pub mod vote {
 		return Ok(());
 	}
 	// UPDATE
-	pub fn update_vote(ctx: Context<UpdateVote>, name: Option<String>, is_vote: Option<bool>) -> Result<()> {
+	pub fn update_vote(ctx: Context<UpdateVote>, name: Option<String>) -> Result<()> {
 		let vote = &mut ctx.accounts.vote;
 		let clock = Clock::get()?;
 		
 		if let Some(t) = name { vote.name = t; }
-		if let Some(v) = is_vote { if v {vote.count += 1;}; }
+
+		vote.modified_on = clock.unix_timestamp;
+		return Ok(());
+	}
+	pub fn cast_vote(ctx: Context<CastVote>) -> Result<()> {
+		let clock = Clock::get()?;
+		
+		let vote = &mut ctx.accounts.vote;
+        vote.count += 1;
 
 		vote.modified_on = clock.unix_timestamp;
 		return Ok(());
@@ -44,14 +52,14 @@ pub mod vote {
 pub struct CreateVote<'info> {
 	#[account(
 		init, 
-		payer = user,
+		payer = admin,
 		space = ACHOR_DISCRIMINATOR_SIZE + VoteState::INIT_SPACE,
-		seeds = [b"vote", user.key().as_ref(), name.as_bytes()],
-		bump
+		seeds = [b"vote", admin.key().as_ref(), name.as_bytes()],
+		bump,
 	)]
 	pub vote: Account<'info, VoteState>,
 	#[account(mut)]
-	pub user: Signer<'info>,
+	pub admin: Signer<'info>,
 	pub system_program: Program<'info, System>,
 }
 
@@ -60,6 +68,13 @@ pub struct UpdateVote<'info> {
 	#[account(mut, has_one = owner)]
 	pub vote: Account<'info, VoteState>,
 	pub owner: Signer<'info>,
+}
+
+#[derive(Accounts)]
+pub struct CastVote<'info> {
+    #[account(mut)]
+    pub vote: Account<'info, VoteState>,
+    pub user: Signer<'info>,
 }
 
 #[derive(Accounts)]
