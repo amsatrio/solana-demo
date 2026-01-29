@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { Program, AnchorProvider, type Idl } from '@coral-xyz/anchor';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchVotes, createVote, updateVote, deleteVote, castVote, fetchAllVotes } from './voteSlice';
+import { createVote, updateVote, deleteVote, castVote, fetchAllVotes } from './voteSlice';
 import idl from '../../../../backend/target/idl/vote.json';
 import type { Vote } from "../../../../backend/target/types/vote";
 import type { AppDispatch, RootState } from '../../store';
