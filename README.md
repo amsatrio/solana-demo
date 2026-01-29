@@ -82,6 +82,8 @@ anchor test
 or:
 solana-test-validator
 solana config set --url localhost
+solana balance 9dEkFh197y7scrxf5BfiEJ7HSFhnNYixECBt4H2cegZE
+solana airdrop 10 9dEkFh197y7scrxf5BfiEJ7HSFhnNYixECBt4H2cegZE --url localhost
 anchor build
 solana airdrop 10
 anchor deploy

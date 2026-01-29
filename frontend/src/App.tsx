@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
-import TodoPage from './modules/todo/TodoPage';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
+import { RouterProvider } from 'react-router-dom';
+import router from './router';
 
 export const App = () => {
     // The network can be set to 'devnet', 'testnet', or 'mainnet'
@@ -29,9 +30,9 @@ export const App = () => {
     return (
         <ThemeProvider theme={theme}>
             <ConnectionProvider endpoint={endpoint}>
-                <WalletProvider autoConnect wallets={wallets}>
+                <WalletProvider wallets={wallets} autoConnect>
                     <WalletModalProvider>
-                        <TodoPage />
+                        <RouterProvider router={router} />
                     </WalletModalProvider>
                 </WalletProvider>
             </ConnectionProvider>

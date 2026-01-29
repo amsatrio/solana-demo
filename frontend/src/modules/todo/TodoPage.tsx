@@ -96,7 +96,7 @@ export default function TodoPage() {
     };
 
     return (
-        <Container maxWidth={false} sx={{ py: 4, px: { xs: 2, md: 6 }, minHeight: '100vh' }}>
+        <Container sx={{ py: 4, px: { xs: 2, md: 6 }, minHeight: '100vh', width: '100%' }}>
             <Typography variant="h4" fontWeight="bold">Solana Todo Manager</Typography>
             <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
 
@@ -110,7 +110,7 @@ export default function TodoPage() {
             </Box>
 
             <TableContainer component={Paper}>
-                <Table sx={{ minWidth: 650 }}>
+                <Table>
                     <TableHead>
                         <TableRow>
                             <TableCell><strong>Status</strong></TableCell>
