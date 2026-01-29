@@ -2,6 +2,7 @@ import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { Vote } from "../target/types/vote";
 import { expect } from "chai";
+import { PublicKey } from "@solana/web3.js";
 
 describe("vote-tests", () => {
   const provider = anchor.AnchorProvider.env();
@@ -87,17 +88,60 @@ describe("vote-tests", () => {
     expect(account.count.toNumber()).to.equal(0);
   });
 
-  it("Cast a Vote - Count", async () => {
+it("Cast a Vote - Count", async () => {
+    // 1. Derive the Receipt PDA
+    const [receiptPda] = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from("receipt"),
+        votePda.toBuffer(),
+        user.publicKey.toBuffer(),
+      ],
+      program.programId
+    );
+
+    // 2. Execute the vote
     await program.methods
       .castVote()
       .accounts({
         vote: votePda,
-        owner: user.publicKey,
+        voteReceipt: receiptPda, // New account required
+        user: user.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
       })
+      .signers([user])
       .rpc();
 
     const account = await program.account.voteState.fetch(votePda);
     expect(account.count.toNumber()).to.equal(1);
+  });
+
+  it("Cast a Vote - Fails when voting a second time", async () => {
+    const [receiptPda] = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from("receipt"),
+        votePda.toBuffer(),
+        user.publicKey.toBuffer(),
+      ],
+      program.programId
+    );
+
+    try {
+      await program.methods
+        .castVote()
+        .accounts({
+          vote: votePda,
+          voteReceipt: receiptPda,
+          user: user.publicKey,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        })
+        .signers([user])
+        .rpc();
+      
+      expect.fail("Should have thrown an error for double voting");
+    } catch (error: any) {
+      expect(error.logs.toString()).to.contain("already in use");
+      console.log("Success: Double vote prevented!");
+    }
   });
 
   it("Deletes a Vote", async () => {
